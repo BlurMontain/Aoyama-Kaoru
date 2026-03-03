@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Diário</title>
+
+<style>
+body{
+    margin:0;
+    background:#d8c8d0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    font-family:Arial;
+}
+
+.container{
+    width:430px;
+    height:932px;
+    background:rgb(0, 0, 0);
+    border-radius:40px;
+    padding:60px 20px;
+    color:white;
+    text-align:center;
+}
+
+.card{
+    height:500px;
+    background:#222121;
+    border-radius:40px;
+    margin:40px 0;
+}
+
+.botoes{
+    display:flex;
+    justify-content: space-around;
+}
+
+button{
+    width:45%;
+    height:45px;
+    border-radius:10px;
+    border:2px solid rgb(32, 34, 171);
+    background:transparent;
+    color:rgb(0, 255, 68);
+    font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Controle Diário</h1>
+
+    <div class="card"></div>
+
+    <div class="botoes">
+        <button onclick="enviar('Entrada')">Entrada</button>
+        <button onclick="enviar('Saída')">Saída</button>
+    </div>
+</div>
+
+<script>
+function enviar(tipo){
+
+fetch("https://script.google.com/macros/s/AKfycbxO3ovb5C4PXwi-8Fc0w1tYOysNnuscZtcAztJvUSotlVNRdgzesok-BF7W7-kKWGLfIg/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ tipo: tipo })
+})
+.then(() => {
+    alert("Enviado!");
+})
+.catch(() => {
+    alert("Erro!");
+});
+
+}
+</script>
+
+</body>
+</html>
