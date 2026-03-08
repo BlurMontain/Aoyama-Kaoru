@@ -8,7 +8,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #ffffff;
+      background: #1a1a2e;
       font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
@@ -248,7 +248,7 @@
   // =====================================================
   // CONFIGURE AQUI — substitua pela URL do seu Web App
   // =====================================================
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbx5kuzNd7nGTqu-BzNjCuqJ80vDsuxe3t_DnVbtLTbyNu1MAwIc0aw5mbnwziAIrBbO/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz9HdfFviy-96UcFggbub-sjlXSsZhzGEqinUsiBse-wlTCOJR1Y7BXI_QSEDCq3SPF/exec";
   // =====================================================
 
   const HORARIOS_DIURNO  = ["05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00"];
@@ -267,6 +267,7 @@
     body.innerHTML = "";
     const hrs = horarios();
     const total = parseInt(document.getElementById("totalInicial").value) || 40;
+    let prevResto = total;
 
     hrs.forEach((h, i) => {
       const row = document.createElement("div");
@@ -274,31 +275,51 @@
 
       const saida  = (data && data[i]) ? (data[i].saida  ?? "") : "";
       const driver = (data && data[i]) ? (data[i].driver ?? "") : "";
-      const resto  = saida !== "" ? (total - parseInt(saida) || "") : "";
+      let resto = "";
+      if (saida !== "") {
+        prevResto = prevResto - (parseInt(saida) || 0);
+        resto = prevResto;
+      }
 
       row.innerHTML = `
         <span>${h}</span>
         <input class="cell-input saida-input" data-index="${i}" type="number" value="${saida}" min="0" placeholder="-" />
         <span class="resto-cell" id="resto-${i}">${resto}</span>
-        <input class="cell-input driver-input" data-index="${i}" type="text" value="${driver}" placeholder="" maxlength="20" />
+        <span class="driver-cell" id="driver-${i}">${driver}</span>
       `;
       body.appendChild(row);
     });
 
-    // Live update Resto on Saida change
+    // Live update Resto + estampa driver ao digitar Saida
     document.querySelectorAll(".saida-input").forEach(inp => {
-      inp.addEventListener("input", () => updateResto());
+      inp.addEventListener("input", () => {
+        updateResto();
+        const i = inp.dataset.index;
+        const driverEl = document.getElementById(`driver-${i}`);
+        if (inp.value !== "") {
+          const name = localStorage.getItem("driverName") || "";
+          driverEl.textContent = name;
+        } else {
+          driverEl.textContent = "";
+        }
+      });
     });
     document.getElementById("totalInicial").addEventListener("input", () => updateResto());
   }
 
   function updateResto() {
     const total = parseInt(document.getElementById("totalInicial").value) || 0;
+    let prevResto = total;
     document.querySelectorAll(".saida-input").forEach(inp => {
       const i = inp.dataset.index;
       const v = inp.value;
       const el = document.getElementById(`resto-${i}`);
-      el.textContent = v !== "" ? (total - parseInt(v)) : "";
+      if (v !== "") {
+        prevResto = prevResto - (parseInt(v) || 0);
+        el.textContent = prevResto;
+      } else {
+        el.textContent = "";
+      }
     });
   }
 
@@ -307,7 +328,7 @@
     const hrs = horarios();
     hrs.forEach((h, i) => {
       const saida  = document.querySelector(`.saida-input[data-index="${i}"]`)?.value ?? "";
-      const driver = document.querySelector(`.driver-input[data-index="${i}"]`)?.value ?? "";
+      const driver = document.getElementById(`driver-${i}`)?.textContent ?? "";
       rows.push({ horario: h, saida, driver });
     });
     return rows;
@@ -324,11 +345,28 @@
     buildGrid(rowData[tab] || []);
   }
 
-  // ---- SetDriver: fills all Driver cells with a single value ----
+  // ---- SetDriver: salva no localStorage e preenche todas as linhas ----
   function setDriver() {
-    const val = prompt("Nome do Driver para todas as linhas:");
-    if (val === null) return;
-    document.querySelectorAll(".driver-input").forEach(inp => inp.value = val);
+    const atual = localStorage.getItem("driverName") || "";
+    const val = prompt("Nome do Driver (salvo neste celular para sempre):", atual);
+    if (val === null || val.trim() === "") return;
+    localStorage.setItem("driverName", val.trim());
+    applyDriver(val.trim());
+    setStatus("✓ Driver '" + val.trim() + "' salvo neste celular!");
+  }
+
+  function applyDriver(name) {
+    // Estampa driver apenas nas linhas que ja tem Saida preenchida
+    document.querySelectorAll(".saida-input").forEach(inp => {
+      const i = inp.dataset.index;
+      const driverEl = document.getElementById(`driver-${i}`);
+      if (driverEl && inp.value !== "") driverEl.textContent = name;
+    });
+  }
+
+  function loadSavedDriver() {
+    const saved = localStorage.getItem("driverName");
+    if (saved) applyDriver(saved);
   }
 
   // ---- Status helper ----
@@ -357,25 +395,19 @@
     }
   }
 
-  // ---- Save to Google Sheets ----
+  // ---- Save to Google Sheets (GET para evitar CORS) ----
   async function saveData() {
     setStatus("Salvando...");
     rowData[currentTab] = gatherRows();
     const total = document.getElementById("totalInicial").value || 40;
     try {
-      const res = await fetch(SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "save",
-          tab: currentTab,
-          totalInicial: total,
-          rows: rowData[currentTab]
-        })
-      });
+      // Serializa as linhas como JSON encodado em query param
+      const payload = encodeURIComponent(JSON.stringify(rowData[currentTab]));
+      const url = `${SHEET_URL}?action=save&tab=${currentTab}&total=${total}&rows=${payload}`;
+      const res = await fetch(url);
       const json = await res.json();
       if (json.error) throw new Error(json.error);
-      setStatus("✓ Dados salvos");
+      setStatus("✓ Dados salvos com sucesso!");
     } catch (e) {
       setStatus("Erro ao salvar: " + e.message, false);
     }
@@ -383,6 +415,7 @@
 
   // ---- Init ----
   buildGrid([]);
+  loadSavedDriver();  // aplica driver salvo no celular automaticamente
 </script>
 </body>
 </html>
