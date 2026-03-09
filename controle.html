@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Excursão</title>
+
+    <!-- Conecta o CSS -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- CABEÇALHO -->
+        <div class="header">
+            <h1>Controle Excursão</h1>
+            <div class="vagas">Restam 70 vagas</div>
+        </div>
+
+        <!-- TABELA -->
+        <div class="table-container">
+
+            <!-- Cabeçalho da tabela -->
+            <div class="table-header">
+                <div>Família2</div>
+                <div>Membros</div>
+                <div>Restante</div>
+                <div>Monitora</div>
+            </div>
+
+             <div id="tabela"></div>
+
+            <!-- Linhas serão inseridas pelo JavaScript -->
+
+        </div>
+
+        <!-- BOTÕES -->
+        <div class="buttons">
+            <button onclick="registrar()">Registrar</button>
+            <button onclick="carregarTabela()">Atualizar</button>
+<div class="table-row">…</div>grid            <button onclick="limpar()">Limpar</button>
+        </div>
+
+    </div>
+
+    <!-- Conecta o JavaScript -->
+    <script src="codigo.js"></script>
+
+</body>
+
+</html>

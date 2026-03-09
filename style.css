@@ -1,0 +1,117 @@
+/* RESET */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* BODY */
+body {
+    background: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #39ff4a; /* verde planilha */
+}
+
+/* CONTAINER PRINCIPAL */
+.container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* CABEÇALHO */
+.header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: normal;
+    color: white;
+}
+
+.vagas {
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* TABELA */
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 70px; /* espaço para os botões */
+}
+
+
+/* CABEÇALHO DA TABELA */
+.table-header {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 0.8fr 1fr;
+    background: #111;
+    font-weight: bold;
+}
+
+.table-header div {
+    padding: 8px 5px;
+    border-right: 1px solid #222;
+    border-bottom: 1px solid #222;
+    text-align: center;
+}
+
+/* LINHAS */
+.table-row {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 0.8fr 1fr;
+}
+
+.table-row div {
+    padding: 8px 5px;
+    border-right: px solid #010000;
+    border-bottom: px solid #111; /* linha suave */
+    text-align: justify;
+}
+
+/* alternar leve tom */
+.table-row:nth-child(even) {
+    background: #0a0a0a;
+}
+
+/* hover suave */
+.table-row:hover {
+    background: #111;
+}
+
+/* BOTÕES */
+.buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 12px 0;
+    background: #000;
+}
+
+button {
+    flex: 1;
+    height: 38px;
+    border: 1px solid #333;
+    background: #111;
+    color: #39ff5a;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1a1a1a;
+}
+
+button:active {
+    background: #222;
+}
