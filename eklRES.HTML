@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle Diario</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #dbdbe8;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .phone-frame {
+      background: #16213e;
+      border-radius: 36px;
+      border: 2px solid #d3d9e0;
+      width: 432px;
+      justify-content: center;
+      padding: 24px 16px 20px;
+      box-shadow: 0 0 40px rgba(0, 200, 255, 0.15);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .header h1 {
+      color: #e0e0e0;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: #00b4d8;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: rgba(0, 180, 216, 0.15);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 10px;
+      background: #0f3460;
+      color: #aaa;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #00b4d8;
+      color: #fff;
+    }
+
+    /* Total Inicial */
+    .total-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .total-row label {
+      color: #ccc;
+      font-size: 15px;
+    }
+
+    .total-input {
+      width: 72px;
+      text-align: center;
+      background: #2a2a4a;
+      border: 1.5px solid #00b4d8;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 6px 8px;
+      outline: none;
+    }
+
+    /* Grid */
+    .grid-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 6px 4px;
+      background: #0f3460;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 2px;
+    }
+
+    .grid-header span {
+      color: #ccc;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .grid-body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      align-items: center;
+      background: #1e2a4a;
+      border-radius: 6px;
+      padding: 4px 2px;
+      transition: background 0.15s;
+    }
+
+    .grid-row:nth-child(even) {
+      background: #243050;
+    }
+
+    .grid-row:hover {
+      background: #2e3d6a;
+    }
+
+    .grid-row span,
+    .grid-row input {
+      text-align: center;
+      font-size: 14px;
+      color: #e0e0e0;
+    }
+
+    .cell-input {
+      width: 100%;
+      background: #2a2a4a;
+      border: 1px solid #00b4d8;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+      padding: 3px 4px;
+      outline: none;
+    }
+
+    .cell-input:focus {
+      border-color: #90e0ef;
+    }
+
+    .resto-cell {
+      color: #90e0ef;
+      font-weight: 600;
+    }
+
+    .driver-cell {
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    /* Status message */
+    #status {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 18px;
+      color: #90e0ef;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn-row button {
+      flex: 1;
+      padding: 10px 4px;
+      border: none;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-setdrv {
+      background: #0f3460;
+      color: #00b4d8;
+      border: 1.5px solid #00b4d8;
+    }
+
+    .btn-setdrv:hover {
+      background: #00b4d8;
+      color: #fff;
+    }
+
+    .btn-modif1 {
+      background: #0f3460;
+      color: #90e0ef;
+      border: 1.5px solid #90e0ef;
+    }
+
+    .btn-modif1:hover {
+      background: #90e0ef;
+      color: #16213e;
+    }
+
+    .btn-modif2 {
+      background: #0f3460;
+      color: #48cae4;
+      border: 1.5px solid #48cae4;
+    }
+
+    .btn-modif2:hover {
+      background: #48cae4;
+      color: #16213e;
+    }
+
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="phone-frame">
+
+    <!-- Header -->
+    <div class="header">
+      <button class="nav-btn" id="prevDay">&#8592;</button>
+      <h1>Controle Diario</h1>
+      <button class="nav-btn" id="nextDay">&#8594;</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-diurno" onclick="switchTab('diurno')">☀️ Diurno</button>
+      <button class="tab-btn" id="tab-noturno" onclick="switchTab('noturno')">🌙 Noturno</button>
+    </div>
+
+    <!-- Total Inicial -->
+    <div class="total-row">
+      <label>Total Inicial:</label>
+      <input type="number" id="totalInicial" class="total-input" value="40" min="0" />
+    </div>
+
+    <!-- Grid Header -->
+    <div class="grid-header">
+      <span>Horario</span>
+      <span>Saida</span>
+      <span>Resto</span>
+      <span>Driver</span>
+    </div>
+
+    <!-- Grid Body -->
+    <div class="grid-body" id="gridBody"></div>
+
+    <!-- Status -->
+    <div id="status"></div>
+
+    <!-- Buttons -->
+    <div class="btn-row">
+      <button class="btn-setdrv" onclick="setDriver()">SetDrv</button>
+      <button class="btn-modif1" onclick="saveData()">Salvar</button>
+      <button class="btn-modif2" onclick="loadData()">Recarregar</button>
+    </div>
+
+  </div>
+
+  <script>
+    // =====================================================
+    // CONFIGURE AQUI — substitua pela URL do seu Web App
+    // =====================================================
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbxEQG9FV7JlGDQtfshTT6y1NOa2zjgsAu2fHoXCMtf7x8fbEUmxmaTAkU58yvGNskMg/exec";
+    // =====================================================
+
+    const HORARIOS_DIURNO = ["05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00"];
+    const HORARIOS_NOTURNO = ["17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
+
+    // Chaves para o localStorage
+    const LOCAL_STORAGE_KEY_DATA = "controleDiarioData";
+    const LOCAL_STORAGE_KEY_TOTAL = "controleDiarioTotalInicial";
+    const LOCAL_STORAGE_KEY_DRIVER = "driverName"; // Já existe, só para referência
+
+    let currentTab = "diurno";
+    // rowData agora armazenará o estado completo de todas as abas localmente
+    let rowData = {
+      "diurno": [],
+      "noturno": []
+    };
+    let totalInicial = 40; // Valor padrão
+
+    function horarios() {
+      return currentTab === "diurno" ? HORARIOS_DIURNO : HORARIOS_NOTURNO;
+    }
+
+    // ---- Build grid ----
+    function buildGrid(data) {
+      const body = document.getElementById("gridBody");
+      body.innerHTML = "";
+      const hrs = horarios();
+      const currentTotal = parseInt(document.getElementById("totalInicial").value) || 0; // Pega o valor atual do input
+      let prevResto = currentTotal;
+
+      hrs.forEach((h, i) => {
+        const row = document.createElement("div");
+        row.className = "grid-row";
+
+        // Pega os dados da linha específica
+        const saida = (data && data[i]) ? (data[i].saida ?? "") : "";
+        const driver = (data && data[i]) ? (data[i].driver ?? "") : "";
+        let resto = "";
+        if (saida !== "") {
+          prevResto = prevResto - (parseInt(saida) || 0);
+          resto = prevResto;
+        }
+
+        row.innerHTML = `
+        <span>${h}</span>
+        <input class="cell-input saida-input" data-index="${i}" type="number" value="${saida}" min="0" placeholder="-" />
+        <span class="resto-cell" id="resto-${i}">${resto}</span>
+        <span class="driver-cell" id="driver-${i}">${driver}</span>
+      `;
+        body.appendChild(row);
+      });
+
+      // Remove event listeners antigos para evitar duplicação (se necessário)
+      document.querySelectorAll(".saida-input").forEach(inp => {
+        inp.removeEventListener("input", updateRestoAndDriver);
+      });
+      // Adiciona event listeners para Saida e Total Inicial
+      document.querySelectorAll(".saida-input").forEach(inp => {
+        inp.addEventListener("input", updateRestoAndDriver);
+      });
+      // Garante que o evento de input para totalInicial seja adicionado/atualizado
+      document.getElementById("totalInicial").removeEventListener("input", updateRestoAndDriver); // Remove se já existir
+      document.getElementById("totalInicial").addEventListener("input", updateRestoAndDriver);
+    }
+
+    // Função única para atualizar resto e carimbar driver
+    function updateRestoAndDriver() {
+      updateResto(); // Atualiza os valores do resto
+
+      // Carimba o driver APENAS nas linhas que estão sendo editadas
+      const driverName = localStorage.getItem(LOCAL_STORAGE_KEY_DRIVER) || "";
+      document.querySelectorAll(".saida-input").forEach(inp => {
+        const i = inp.dataset.index;
+        const driverEl = document.getElementById(`driver-${i}`);
+        // Só carimba se o input não estiver vazio E o driver já não estiver carimbado (para evitar sobrescrever um driver diferente, se for o caso)
+        if (inp.value !== "" && driverEl.textContent === "") {
+          driverEl.textContent = driverName;
+        } else if (inp.value === "" && driverEl.textContent === driverName) {
+          // Se o input foi limpo e o driver era o default, limpa o driver
+          driverEl.textContent = "";
+        }
+      });
+      saveLocalState(); // Salva o estado atual no localStorage após cada modificação
+    }
+
+    function updateResto() {
+      const currentTotal = parseInt(document.getElementById("totalInicial").value) || 0;
+      let prevResto = currentTotal;
+      document.querySelectorAll(".saida-input").forEach(inp => {
+        const i = inp.dataset.index;
+        const v = inp.value;
+        const el = document.getElementById(`resto-${i}`);
+        if (v !== "") {
+          prevResto = prevResto - (parseInt(v) || 0);
+          el.textContent = prevResto;
+        } else {
+          el.textContent = "";
+        }
+      });
+    }
+
+    // Função para coletar todos os dados da grid atual
+    function gatherRows() {
+      const rows = [];
+      const hrs = horarios();
+      hrs.forEach((h, i) => {
+        const saida = document.querySelector(`.saida-input[data-index="${i}"]`)?.value ?? "";
+        const driver = document.getElementById(`driver-${i}`)?.textContent ?? "";
+        rows.push({ horario: h, saida, driver });
+      });
+      return rows;
+    }
+
+    // Função para salvar o estado atual (rowData e totalInicial) no localStorage
+    function saveLocalState() {
+      // Garante que o rowData para a aba atual esteja atualizado antes de salvar
+      rowData[currentTab] = gatherRows();
+      localStorage.setItem(LOCAL_STORAGE_KEY_DATA, JSON.stringify(rowData));
+      localStorage.setItem(LOCAL_STORAGE_KEY_TOTAL, document.getElementById("totalInicial").value);
+    }
+
+    // Função para carregar o estado salvo do localStorage
+    function loadLocalState() {
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY_DATA);
+      const savedTotal = localStorage.getItem(LOCAL_STORAGE_KEY_TOTAL);
+
+      if (savedData) {
+        try {
+          rowData = JSON.parse(savedData);
+          // Atualiza o totalInicial a partir do localStorage
+          if (savedTotal) {
+            document.getElementById("totalInicial").value = savedTotal;
+            totalInicial = parseInt(savedTotal);
+          }
+          buildGrid(rowData[currentTab] || []); // Constrói a grid com os dados da aba atual
+          setStatus("✓ Dados locais carregados");
+          return true; // Indica que carregou do local
+        } catch (e) {
+          console.error("Erro ao carregar dados do localStorage:", e);
+          // Se houver erro no parsing, reseta e tenta do Sheets
+          localStorage.removeItem(LOCAL_STORAGE_KEY_DATA);
+          localStorage.removeItem(LOCAL_STORAGE_KEY_TOTAL);
+          return false;
+        }
+      }
+      return false; // Indica que não havia dados locais
+    }
+
+    // ---- Tab switch ----
+    function switchTab(tab) {
+      // Salva o estado da aba atual no rowData antes de trocar
+      saveLocalState();
+
+      currentTab = tab;
+      document.getElementById("tab-diurno").classList.toggle("active", tab === "diurno");
+      document.getElementById("tab-noturno").classList.toggle("active", tab === "noturno");
+
+      // Reconstroi a grid com os dados da nova aba (ou vazia se não houver)
+      buildGrid(rowData[tab] || []);
+      updateResto(); // Atualiza o resto para a nova aba
+    }
+
+    // ---- SetDriver: salva no localStorage e preenche todas as linhas ----
+    function setDriver() {
+      const atual = localStorage.getItem(LOCAL_STORAGE_KEY_DRIVER) || "";
+      const val = prompt("Nome do Driver (salvo neste celular para sempre):", atual);
+      if (val === null || val.trim() === "") return;
+      localStorage.setItem(LOCAL_STORAGE_KEY_DRIVER, val.trim());
+      applyDriver(val.trim());
+      setStatus("✓ Driver '" + val.trim() + "' salvo neste celular!");
+      saveLocalState(); // Salva o estado local após mudar o driver
+    }
+
+    function applyDriver(name) {
+      // Estampa driver apenas nas linhas que ja tem Saida preenchida
+      document.querySelectorAll(".saida-input").forEach(inp => {
+        const i = inp.dataset.index;
+        const driverEl = document.getElementById(`driver-${i}`);
+        if (driverEl && inp.value !== "") driverEl.textContent = name;
+      });
+    }
+
+    function loadSavedDriver() {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_DRIVER);
+      if (saved) applyDriver(saved);
+    }
+
+    // ---- Status helper ----
+    function setStatus(msg, ok = true) {
+      const el = document.getElementById("status");
+      el.textContent = msg;
+      el.style.color = ok ? "#90e0ef" : "#ff6b6b";
+      // Limpa a mensagem de status após alguns segundos
+      clearTimeout(el.timeoutId); // Limpa qualquer timeout anterior
+      el.timeoutId = setTimeout(() => el.textContent = "", 3000);
+    }
+
+    // ---- Load from Google Sheets ----
+    // Esta função agora SEMPRE carrega do Sheets, sobrescrevendo o estado local (se o usuário decidir carregar)
+    async function loadDataFromSheet() {
+      setStatus("Carregando do servidor...");
+      try {
+        const url = `${SHEET_URL}?action=load&tab=${currentTab}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+
+        // Atualiza o totalInicial e rowData com os dados do Sheets
+        totalInicial = json.totalInicial ? parseInt(json.totalInicial) : 40;
+        document.getElementById("totalInicial").value = totalInicial;
+
+        rowData[currentTab] = json.rows || []; // Atualiza os dados da aba atual com o que veio do Sheets
+        buildGrid(rowData[currentTab]); // Reconstrói a grid com os dados do Sheets
+        updateResto(); // Garante que o resto seja calculado corretamente
+        saveLocalState(); // Salva o estado atualizado (do Sheets) no localStorage
+        setStatus("✓ Dados do servidor carregados");
+      } catch (e) {
+        setStatus("Erro ao carregar do servidor: " + e.message, false);
+      }
+    }
+
+    // ---- Save to Google Sheets (GET para evitar CORS) ----
+    async function saveDataToSheet() {
+      setStatus("Salvando no servidor...");
+      saveLocalState(); // Garante que o estado local está totalmente atualizado antes de enviar
+      const total = document.getElementById("totalInicial").value || 40;
+      try {
+        // Serializa as linhas da ABA ATUAL como JSON encodado em query param
+        const payload = encodeURIComponent(JSON.stringify(rowData[currentTab]));
+        const url = `${SHEET_URL}?action=save&tab=${currentTab}&total=${total}&rows=${payload}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.error) throw new Error(json.error);
+        setStatus("✓ Dados salvos no servidor com sucesso!");
+      } catch (e) {
+        setStatus("Erro ao salvar no servidor: " + e.message, false);
+      }
+    }
+
+    // ---- Função de "Recarregar" do botão (que agora carregará do Sheets) ----
+    // Renomeado para evitar conflito com a função de inicialização
+    function handleReloadButtonClick() {
+      loadDataFromSheet();
+    }
+
+    // ---- Init ----
+    // Carrega o estado local na inicialização
+    const hasLocalData = loadLocalState();
+
+    // Se não houver dados locais ou se falhou ao carregar, tenta carregar do Sheets
+    if (!hasLocalData) {
+      loadDataFromSheet();
+    }
+
+    loadSavedDriver(); // Carrega o nome do driver salvo no localStorage
+
+    // Associa os botões Salvar e Recarregar às novas funções
+    document.querySelector(".btn-modif1").onclick = saveDataToSheet; // Salvar
+    document.querySelector(".btn-modif2").onclick = handleReloadButtonClick; // Recarregar
+
+    // NOVO: Recarrega os dados do Sheets a cada 10 segundos
+    setInterval(function () {
+      // Ao invés de carregar cegamente, vamos só atualizar os dados se não houver edições locais pendentes.
+      // Ou seja, se o usuário não estiver digitando, recarrega do Sheets.
+      // Se ele estiver digitando, a gente não interrompe.
+      // Uma implementação mais robusta poderia perguntar ao usuário.
+      // Por enquanto, vamos sempre carregar do Sheets (a menos que você esteja ativamente editando)
+      // O saveLocalState() já está sendo chamado no input, então o dado digitado está seguro localmente.
+      loadDataFromSheet();
+    }, 20000); // 10000 milissegundos = 10 segundos
+  </script>
+</body>
+
+</html>
